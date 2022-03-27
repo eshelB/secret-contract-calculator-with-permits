@@ -16,7 +16,7 @@
           ],
           "properties": {
             "permit": {
-              "$ref": "#/definitions/Permit"
+              "$ref": "#/definitions/Permit_for_CalculatorPermission"
             },
             "query": {
               "$ref": "#/definitions/QueryWithPermit"
@@ -31,40 +31,25 @@
       "description": "Binary is a wrapper around Vec<u8> to add base64 de/serialization with serde. It also adds some helper methods to help encode inline.\n\nThis is only needed as serde-json-{core,wasm} has a horrible encoding for Vec<u8>",
       "type": "string"
     },
-    "HumanAddr": {
-      "type": "string"
-    },
-    "Permission": {
+    "CalculatorPermission": {
       "type": "string",
       "enum": [
         "calculation_history"
       ]
     },
-    "Permit": {
-      "type": "object",
-      "required": [
-        "params",
-        "signature"
-      ],
-      "properties": {
-        "params": {
-          "$ref": "#/definitions/PermitParams"
-        },
-        "signature": {
-          "$ref": "#/definitions/PermitSignature"
-        }
-      }
+    "HumanAddr": {
+      "type": "string"
     },
-    "PermitParams": {
+    "PermitParams_for_CalculatorPermission": {
       "type": "object",
       "required": [
-        "allowed_contracts",
+        "allowed_tokens",
         "chain_id",
         "permissions",
         "permit_name"
       ],
       "properties": {
-        "allowed_contracts": {
+        "allowed_tokens": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/HumanAddr"
@@ -76,7 +61,7 @@
         "permissions": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Permission"
+            "$ref": "#/definitions/CalculatorPermission"
           }
         },
         "permit_name": {
@@ -96,6 +81,21 @@
         },
         "signature": {
           "$ref": "#/definitions/Binary"
+        }
+      }
+    },
+    "Permit_for_CalculatorPermission": {
+      "type": "object",
+      "required": [
+        "params",
+        "signature"
+      ],
+      "properties": {
+        "params": {
+          "$ref": "#/definitions/PermitParams_for_CalculatorPermission"
+        },
+        "signature": {
+          "$ref": "#/definitions/PermitSignature"
         }
       }
     },
