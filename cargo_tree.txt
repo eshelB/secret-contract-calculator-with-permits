@@ -1,0 +1,132 @@
+calculator v0.1.0 (/home/esh/Training/secret-contracts/calculator-with-permits)
+├── base64 v0.13.0
+├── remain v0.2.2 (proc-macro)
+│   ├── proc-macro2 v1.0.36
+│   │   └── unicode-xid v0.2.2
+│   ├── quote v1.0.15
+│   │   └── proc-macro2 v1.0.36 (*)
+│   └── syn v1.0.88
+│       ├── proc-macro2 v1.0.36 (*)
+│       ├── quote v1.0.15 (*)
+│       └── unicode-xid v0.2.2
+├── ripemd160 v0.9.1
+│   ├── block-buffer v0.9.0
+│   │   └── generic-array v0.14.5
+│   │       └── typenum v1.15.0
+│   │       [build-dependencies]
+│   │       └── version_check v0.9.4
+│   ├── digest v0.9.0
+│   │   └── generic-array v0.14.5 (*)
+│   └── opaque-debug v0.3.0
+├── schemars v0.7.6
+│   ├── schemars_derive v0.7.6 (proc-macro)
+│   │   ├── proc-macro2 v1.0.36 (*)
+│   │   ├── quote v1.0.15 (*)
+│   │   ├── serde_derive_internals v0.25.0
+│   │   │   ├── proc-macro2 v1.0.36 (*)
+│   │   │   ├── quote v1.0.15 (*)
+│   │   │   └── syn v1.0.88 (*)
+│   │   └── syn v1.0.88 (*)
+│   ├── serde v1.0.136
+│   │   └── serde_derive v1.0.136 (proc-macro)
+│   │       ├── proc-macro2 v1.0.36 (*)
+│   │       ├── quote v1.0.15 (*)
+│   │       └── syn v1.0.88 (*)
+│   └── serde_json v1.0.79
+│       ├── itoa v1.0.1
+│       ├── ryu v1.0.9
+│       └── serde v1.0.136 (*)
+├── secp256k1 v0.22.1
+│   └── secp256k1-sys v0.5.0
+│       [build-dependencies]
+│       └── cc v1.0.73
+├── secret-cosmwasm-std v0.10.0
+│   ├── base64 v0.11.0
+│   ├── schemars v0.7.6 (*)
+│   ├── serde v1.0.136 (*)
+│   ├── serde-json-wasm v0.2.3
+│   │   └── serde v1.0.136 (*)
+│   └── snafu v0.6.10
+│       ├── doc-comment v0.3.3
+│       └── snafu-derive v0.6.10 (proc-macro)
+│           ├── proc-macro2 v1.0.36 (*)
+│           ├── quote v1.0.15 (*)
+│           └── syn v1.0.88 (*)
+├── secret-cosmwasm-storage v0.10.0
+│   ├── secret-cosmwasm-std v0.10.0 (*)
+│   └── serde v1.0.136 (*)
+├── secret-toolkit v0.2.0
+│   ├── secret-toolkit-crypto v0.2.0
+│   │   ├── libsecp256k1 v0.3.5
+│   │   │   ├── arrayref v0.3.6
+│   │   │   ├── crunchy v0.2.2
+│   │   │   ├── digest v0.8.1
+│   │   │   │   └── generic-array v0.12.4
+│   │   │   │       └── typenum v1.15.0
+│   │   │   ├── hmac-drbg v0.2.0
+│   │   │   │   ├── digest v0.8.1 (*)
+│   │   │   │   ├── generic-array v0.12.4 (*)
+│   │   │   │   └── hmac v0.7.1
+│   │   │   │       ├── crypto-mac v0.7.0
+│   │   │   │       │   ├── generic-array v0.12.4 (*)
+│   │   │   │       │   └── subtle v1.0.0
+│   │   │   │       └── digest v0.8.1 (*)
+│   │   │   ├── rand v0.7.3
+│   │   │   │   ├── rand_chacha v0.2.2
+│   │   │   │   │   ├── ppv-lite86 v0.2.16
+│   │   │   │   │   └── rand_core v0.5.1
+│   │   │   │   └── rand_core v0.5.1
+│   │   │   ├── sha2 v0.8.2
+│   │   │   │   ├── block-buffer v0.7.3
+│   │   │   │   │   ├── block-padding v0.1.5
+│   │   │   │   │   │   └── byte-tools v0.3.1
+│   │   │   │   │   ├── byte-tools v0.3.1
+│   │   │   │   │   ├── byteorder v1.4.3
+│   │   │   │   │   └── generic-array v0.12.4 (*)
+│   │   │   │   ├── digest v0.8.1 (*)
+│   │   │   │   ├── fake-simd v0.1.2
+│   │   │   │   └── opaque-debug v0.2.3
+│   │   │   ├── subtle v2.4.1
+│   │   │   └── typenum v1.15.0
+│   │   ├── rand_chacha v0.2.2 (*)
+│   │   ├── rand_core v0.5.1
+│   │   ├── secret-cosmwasm-std v0.10.0 (*)
+│   │   └── sha2 v0.9.9
+│   │       ├── block-buffer v0.9.0 (*)
+│   │       ├── cfg-if v1.0.0
+│   │       ├── cpufeatures v0.2.2
+│   │       ├── digest v0.9.0 (*)
+│   │       └── opaque-debug v0.3.0
+│   ├── secret-toolkit-serialization v0.2.0
+│   │   ├── bincode2 v2.0.1
+│   │   │   ├── byteorder v1.4.3
+│   │   │   └── serde v1.0.136 (*)
+│   │   ├── schemars v0.7.6 (*)
+│   │   ├── secret-cosmwasm-std v0.10.0 (*)
+│   │   └── serde v1.0.136 (*)
+│   ├── secret-toolkit-snip20 v0.2.0
+│   │   ├── schemars v0.7.6 (*)
+│   │   ├── secret-cosmwasm-std v0.10.0 (*)
+│   │   ├── secret-toolkit-utils v0.2.0
+│   │   │   ├── schemars v0.7.6 (*)
+│   │   │   ├── secret-cosmwasm-std v0.10.0 (*)
+│   │   │   └── serde v1.0.136 (*)
+│   │   └── serde v1.0.136 (*)
+│   ├── secret-toolkit-snip721 v0.2.0
+│   │   ├── schemars v0.7.6 (*)
+│   │   ├── secret-cosmwasm-std v0.10.0 (*)
+│   │   ├── secret-toolkit-utils v0.2.0 (*)
+│   │   └── serde v1.0.136 (*)
+│   ├── secret-toolkit-storage v0.2.0
+│   │   ├── secret-cosmwasm-std v0.10.0 (*)
+│   │   ├── secret-cosmwasm-storage v0.10.0 (*)
+│   │   ├── secret-toolkit-serialization v0.2.0 (*)
+│   │   └── serde v1.0.136 (*)
+│   └── secret-toolkit-utils v0.2.0 (*)
+├── serde v1.0.136 (*)
+└── snafu v0.6.10 (*)
+[dev-dependencies]
+├── cosmwasm-schema v0.10.1
+│   ├── schemars v0.7.6 (*)
+│   └── serde_json v1.0.79 (*)
+└── serde_json v1.0.79 (*)

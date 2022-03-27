@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HandleMsg",
+  "anyOf": [
+    {
+      "type": "object",
+      "required": [
+        "add"
+      ],
+      "properties": {
+        "add": {
+          "$ref": "#/definitions/BinaryOp"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "sub"
+      ],
+      "properties": {
+        "sub": {
+          "$ref": "#/definitions/BinaryOp"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "mul"
+      ],
+      "properties": {
+        "mul": {
+          "$ref": "#/definitions/BinaryOp"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "div"
+      ],
+      "properties": {
+        "div": {
+          "$ref": "#/definitions/BinaryOp"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "sqrt"
+      ],
+      "properties": {
+        "sqrt": {
+          "$ref": "#/definitions/UnaryOp"
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "BinaryOp": {
+      "type": "array",
+      "items": [
+        {
+          "$ref": "#/definitions/Uint128"
+        },
+        {
+          "$ref": "#/definitions/Uint128"
+        }
+      ],
+      "maxItems": 2,
+      "minItems": 2
+    },
+    "Uint128": {
+      "type": "string"
+    },
+    "UnaryOp": {
+      "$ref": "#/definitions/Uint128"
+    }
+  }
+}

@@ -1,0 +1,160 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "QueryMsg",
+  "anyOf": [
+    {
+      "type": "object",
+      "required": [
+        "with_permit"
+      ],
+      "properties": {
+        "with_permit": {
+          "type": "object",
+          "required": [
+            "permit",
+            "query"
+          ],
+          "properties": {
+            "permit": {
+              "$ref": "#/definitions/Permit"
+            },
+            "query": {
+              "$ref": "#/definitions/QueryWithPermit"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "Binary": {
+      "description": "Binary is a wrapper around Vec<u8> to add base64 de/serialization with serde. It also adds some helper methods to help encode inline.\n\nThis is only needed as serde-json-{core,wasm} has a horrible encoding for Vec<u8>",
+      "type": "string"
+    },
+    "HumanAddr": {
+      "type": "string"
+    },
+    "Permission": {
+      "type": "string",
+      "enum": [
+        "calculation_history"
+      ]
+    },
+    "Permit": {
+      "type": "object",
+      "required": [
+        "params",
+        "signature"
+      ],
+      "properties": {
+        "params": {
+          "$ref": "#/definitions/PermitParams"
+        },
+        "signature": {
+          "$ref": "#/definitions/PermitSignature"
+        }
+      }
+    },
+    "PermitParams": {
+      "type": "object",
+      "required": [
+        "allowed_contracts",
+        "chain_id",
+        "permissions",
+        "permit_name"
+      ],
+      "properties": {
+        "allowed_contracts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/HumanAddr"
+          }
+        },
+        "chain_id": {
+          "type": "string"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Permission"
+          }
+        },
+        "permit_name": {
+          "type": "string"
+        }
+      }
+    },
+    "PermitSignature": {
+      "type": "object",
+      "required": [
+        "pub_key",
+        "signature"
+      ],
+      "properties": {
+        "pub_key": {
+          "$ref": "#/definitions/PubKey"
+        },
+        "signature": {
+          "$ref": "#/definitions/Binary"
+        }
+      }
+    },
+    "PubKey": {
+      "type": "object",
+      "required": [
+        "type",
+        "value"
+      ],
+      "properties": {
+        "type": {
+          "description": "ignored, but must be \"tendermint/PubKeySecp256k1\" otherwise the verification will fail",
+          "type": "string"
+        },
+        "value": {
+          "description": "Secp256k1 PubKey",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Binary"
+            }
+          ]
+        }
+      }
+    },
+    "QueryWithPermit": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": [
+            "calculation_history"
+          ],
+          "properties": {
+            "calculation_history": {
+              "type": "object",
+              "required": [
+                "page_size"
+              ],
+              "properties": {
+                "page": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/definitions/Uint128"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "page_size": {
+                  "$ref": "#/definitions/Uint128"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Uint128": {
+      "type": "string"
+    }
+  }
+}

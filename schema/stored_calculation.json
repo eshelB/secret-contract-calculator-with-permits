@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "StoredCalculation",
+  "type": "object",
+  "required": [
+    "left_operand",
+    "operation",
+    "result"
+  ],
+  "properties": {
+    "left_operand": {
+      "$ref": "#/definitions/Uint128"
+    },
+    "operation": {
+      "type": "string"
+    },
+    "result": {
+      "$ref": "#/definitions/Uint128"
+    },
+    "right_operand": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/Uint128"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "Uint128": {
+      "type": "string"
+    }
+  }
+}
