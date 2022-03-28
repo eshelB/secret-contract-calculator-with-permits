@@ -89,9 +89,9 @@ jobs:
           b_mnemonic="jelly shadow frog dirt dragon use armed praise universe win jungle close inmate rain oil canvas beauty pioneer chef soccer icon dizzy thunder meadow"
 
           echo adding key for a
-          echo $a_mnemonic | secretcli keys add a --recover
+          echo $a_mnemonic | secretcli keys add a --keyring-backend test --recover
           echo adding key for b
-          echo $b_mnemonic | secretcli keys add b --recover
+          echo $b_mnemonic | secretcli keys add b --keyring-backend test --recover
 
           # docker run --rm -v "$(pwd)":/contract \
           # --mount type=volume,source="$(basename "$(pwd)")_cache",target=/code/target \
