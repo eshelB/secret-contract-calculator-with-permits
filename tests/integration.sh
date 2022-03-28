@@ -159,7 +159,7 @@ function upload_code() {
 
     log uploading code from dir "$directory"
 
-    tx_hash="$(tx_of secretcli tx compute store "$directory/contract.wasm.gz" --from a --keyring-backend test -y --gas 10000000)"
+    tx_hash="$(tx_of secretcli tx compute store "$directory/contract.wasm.gz" --from a  -y --gas 10000000)"
     log "uploaded contract with tx hash $tx_hash"
     code_id="$(
         wait_for_tx "$tx_hash" 'waiting for contract upload' |
@@ -187,7 +187,7 @@ function instantiate() {
     log "${init_msg}"
 
     local tx_hash
-    tx_hash="$(tx_of secretcli tx compute instantiate "$code_id" "$init_msg" --label "$(label_by_id "$code_id")" --from a --keyring-backend test --gas "10000000" -y)"
+    tx_hash="$(tx_of secretcli tx compute instantiate "$code_id" "$init_msg" --label "$(label_by_id "$code_id")" --from a  --gas "10000000" -y)"
     wait_for_tx "$tx_hash" 'waiting for init to complete'
     log "instantiation completed"
 }
@@ -228,12 +228,8 @@ function sign_permit() {
 
     local sig
     if [[ -z "${IS_GITHUB_ACTIONS+x}" ]]; then
-      echo signing NOT from github
       sig=$(docker exec secretdev bash -c "/usr/bin/secretd tx sign-doc <(echo '"$permit"') --from '$key'")
     else
-      echo signing from github
-      echo "key=$key"
-      echo "permit=$permit"
       sig=$(secretcli tx sign-doc <(echo "$permit") --from "$key")
     fi
 
@@ -364,7 +360,7 @@ function test_add() {
 
     log "adding..."
     local add_message='{"add": ["23", "3"]}'
-    tx_hash="$(compute_execute "$contract_addr" "$add_message" "--from" "$key" --gas "150000" "-y" --keyring-backend test)"
+    tx_hash="$(compute_execute "$contract_addr" "$add_message" "--from" "$key" --gas "150000" "-y" )"
     echo "$tx_hash"
 
     local add_response
@@ -387,7 +383,7 @@ function test_sub() {
 
     log "subtracting..."
     local sub_message='{"sub": ["23", "3"]}'
-    tx_hash="$(compute_execute "$contract_addr" "$sub_message" "--from" "$key" --keyring-backend test --gas "150000" "-y")"
+    tx_hash="$(compute_execute "$contract_addr" "$sub_message" "--from" "$key"  --gas "150000" "-y")"
     echo "$tx_hash"
 
     local sub_response
@@ -410,7 +406,7 @@ function test_mul() {
 
     log "multiplying..."
     local mul_message='{"mul": ["23", "3"]}'
-    tx_hash="$(compute_execute "$contract_addr" "$mul_message" "--from" "$key" --keyring-backend test --gas "150000" "-y")"
+    tx_hash="$(compute_execute "$contract_addr" "$mul_message" "--from" "$key"  --gas "150000" "-y")"
     echo "$tx_hash"
 
     local mul_response
@@ -433,7 +429,7 @@ function test_div() {
 
     log "dividing..."
     local div_message='{"div": ["23", "3"]}'
-    tx_hash="$(compute_execute "$contract_addr" "$div_message" "--from" "$key" --keyring-backend test --gas "150000" "-y")"
+    tx_hash="$(compute_execute "$contract_addr" "$div_message" "--from" "$key"  --gas "150000" "-y")"
     echo "$tx_hash"
 
     local div_response
@@ -457,7 +453,7 @@ function test_div_by_zero() {
     log "dividing..."
     local div_message='{"div": ["23", "0"]}'
 
-    tx_hash="$(compute_execute "$contract_addr" "$div_message" "--from" "$key" --keyring-backend test --gas "150000" "-y")"
+    tx_hash="$(compute_execute "$contract_addr" "$div_message" "--from" "$key"  --gas "150000" "-y")"
     echo "$tx_hash"
 
     local div_response
@@ -483,7 +479,7 @@ function test_sqrt() {
 
     log "calculating square root..."
     local sqrt_message='{"sqrt": "23"}'
-    tx_hash="$(compute_execute "$contract_addr" "$sqrt_message" "--from" "$key" --keyring-backend test --gas "150000" "-y")"
+    tx_hash="$(compute_execute "$contract_addr" "$sqrt_message" "--from" "$key"  --gas "150000" "-y")"
     echo "$tx_hash"
 
     local sqrt_response
@@ -502,16 +498,17 @@ function main() {
 
     local init_msg
     init_msg='{}'
-    local dir
 
-    set -e
+    local dir
     if [[ -z "${IS_GITHUB_ACTIONS+x}" ]]; then
-        dir="."
-    else
+        echo not running from github actions
         dir="code"
+    else
+        echo running from github actions
+        dir="."
     fi
 
-    contract_addr="$(create_contract '.' "$init_msg")"
+    contract_addr="$(create_contract "$dir" "$init_msg")"
 
     test_permit "$contract_addr"
     test_add "$contract_addr"
