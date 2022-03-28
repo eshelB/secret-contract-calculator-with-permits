@@ -74,6 +74,9 @@ jobs:
           # make file runnable, might not be necessary
           chmod +x "./tests/integration.sh"
 
+          echo hello world
+          docker ps
+
           # run script
           "./tests/integration.sh"
     services:
