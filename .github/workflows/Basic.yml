@@ -66,6 +66,9 @@ jobs:
     name: Integration tests
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
       - name: integration-tests script
         run: |
           # make file runnable, might not be necessary
