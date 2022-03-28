@@ -228,8 +228,12 @@ function sign_permit() {
 
     local sig
     if [[ -z "${IS_GITHUB_ACTIONS+x}" ]]; then
+      log signing NOT from github
       sig=$(docker exec secretdev bash -c "/usr/bin/secretd tx sign-doc <(echo '"$permit"') --from '$key'")
     else
+      log signing from github
+      log "key=$key"
+      log "permit=$permit"
       sig=$(secretcli tx sign-doc <(echo "$permit") --from "$key")
     fi
 
