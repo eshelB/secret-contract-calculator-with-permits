@@ -9,7 +9,8 @@ set -o pipefail # If anything in a pipeline fails, the pipe's exit status is a f
 # In particular, it's not possible to dynamically expand aliases, but `tx_of` dynamically executes whatever
 # we specify in its arguments.
 function secretcli() {
-    if [[ -z "$IS_GITHUB_ACTIONS" ]]; then
+    set -e
+    if [[ -z "${IS_GITHUB_ACTIONS+x}" ]]; then
       docker exec secretdev /usr/bin/secretd "$@"
     else
       /usr/local/bin/secretcli "$@"
@@ -280,13 +281,13 @@ function test_permit() {
     wrong_contract=$(secretcli keys show -a banana)
 
     permit='{"account_number":"0","sequence":"0","chain_id":"blabla","msgs":[{"type":"query_permit","value":{"permit_name":"test","allowed_tokens":["'"$wrong_contract"'"],"permissions":["calculation_history"]}}],"fee":{"amount":[{"denom":"uscrt","amount":"0"}],"gas":"1"},"memo":""}'
-    expected_error="Error: query result: encrypted: Permit doesn't apply to token \"$contract_addr\", allowed tokens: [\"$wrong_contract\"] "
+    expected_error="Error: query result: encrypted: Permit doesn't apply to token \"$contract_addr\", allowed tokens: [\"$wrong_contract\"]"
 
     key=a
     sig=$(docker exec secretdev bash -c "/usr/bin/secretd tx sign-doc <(echo '$permit') --from '$key'")
     permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test","chain_id":"blabla","allowed_tokens":["'"$wrong_contract"'"],"permissions":["calculation_history"]},"signature":'"$sig"'}}}'
     result="$(compute_query "$contract_addr" "$permit_query" 2>&1 || true )"
-    result_comparable=$(echo $result | sed 's/Usage:.*//')
+    result_comparable=$(echo $result | sed 's/Usage:.*//' | xargs -0)
 
     assert_eq "$result_comparable" "$expected_error"
     log "no contract in permit: ASSERTION_SUCCESS"
@@ -298,7 +299,7 @@ function test_permit() {
     permit=$(docker exec secretdev bash -c "/usr/bin/secretd tx sign-doc <(echo '$permit') --from '$key'")
     permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test","chain_id":"blabla","allowed_tokens":["'"$contract_addr"'"],"permissions":["no_permissions"]},"signature":'"$permit"'}}}'
     result="$(compute_query "$contract_addr" "$permit_query" 2>&1 || true )"
-    result_comparable=$(echo $result | sed 's/ Usage:.*//')
+    result_comparable=$(echo $result | sed 's/ Usage:.*//' | xargs -0)
 
     assert_eq "$result_comparable" "$expected_error"
     log "no permissions in permit: ASSERTION_SUCCESS"
@@ -310,7 +311,7 @@ function test_permit() {
     permit=$(docker exec secretdev bash -c "/usr/bin/secretd tx sign-doc <(echo '$permit') --from '$key'")
     permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test-2","chain_id":"blabla","allowed_tokens":["'"$contract_addr"'"],"permissions":["calculation_history"]},"signature":'"$permit"'}}}'
     result="$(compute_query "$contract_addr" "$permit_query" 2>&1 || true )"
-    result_comparable=$(echo $result | sed 's/ Usage:.*//')
+    result_comparable=$(echo $result | sed 's/ Usage:.*//' | xargs -0)
 
     assert_eq "$result_comparable" "$expected_error"
     log "incorrect signature: ASSERTION_SUCCESS"
@@ -322,7 +323,7 @@ function test_permit() {
     permit=$(docker exec secretdev bash -c "/usr/bin/secretd tx sign-doc <(echo '$permit') --from '$key'")
     permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test","chain_id":"blabla","allowed_tokens":["'"$contract_addr"'"],"permissions":["calculation_history"]},"signature":'"$permit"'}}}'
     result="$(compute_query "$contract_addr" "$permit_query" 2>&1 || true )"
-    result_comparable=$(echo $result | sed 's/ Usage:.*//')
+    result_comparable=$(echo $result | sed 's/ Usage:.*//' | xargs -0)
 
     assert_eq "$result_comparable" "$expected_output"
     log "permit correct: ASSERTION_SUCCESS"

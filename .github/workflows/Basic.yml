@@ -87,6 +87,8 @@ jobs:
           secretcli keys add a --keyring-backend test
           secretcli keys add b --keyring-backend test
 
+          echo 'Error: query result: encrypted: Permit doesn'\''t apply to token "secret10pyejy66429refv3g35g2t7am0was7ya6hvrzf", allowed tokens: ["secret1547m3gnmhs4f27rwaft8czaknhyz027kvta2qs"] ' | xargs -0
+
           # run script
           "./tests/integration.sh"
     services:
