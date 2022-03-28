@@ -70,14 +70,22 @@ jobs:
         uses: actions/checkout@v2
 
       - name: integration-tests script
+        env:
+          IS_GITHUB_ACTIONS: "true"
         run: |
           # make file runnable, might not be necessary
           chmod +x "./tests/integration.sh"
 
-          wget https://github.com/scrtlabs/SecretNetwork/releases/download/v1.2.5/secretnetwork_1.2.6vr_rocksdb_amd64.deb
+          wget -q https://github.com/scrtlabs/SecretNetwork/releases/download/v1.2.5/secretnetwork_1.2.6vr_rocksdb_amd64.deb
           sudo dpkg -i secret*.deb
+          echo installed secretcli with version "$(secretcli version)"
+          echo installed on "$(which secretcli)"
 
-          secretcli version
+          secretcli config chain-id secret-4
+          secretcli config output json
+          secretcli config node http://localhost:26657
+          secretcli keys add a --keyring-backend test
+          secretcli keys add b --keyring-backend test
 
           # run script
           "./tests/integration.sh"

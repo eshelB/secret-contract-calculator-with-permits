@@ -9,7 +9,11 @@ set -o pipefail # If anything in a pipeline fails, the pipe's exit status is a f
 # In particular, it's not possible to dynamically expand aliases, but `tx_of` dynamically executes whatever
 # we specify in its arguments.
 function secretcli() {
-    docker exec secretdev /usr/bin/secretd "$@"
+    if [[ -z "$IS_GITHUB_ACTIONS" ]]; then
+      docker exec secretdev /usr/bin/secretd "$@"
+    else
+      /usr/local/bin/secretcli "$@"
+    fi
 }
 
 # Just like `echo`, but prints to stderr
