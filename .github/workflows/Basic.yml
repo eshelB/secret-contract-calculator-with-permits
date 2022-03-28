@@ -74,8 +74,10 @@ jobs:
           # make file runnable, might not be necessary
           chmod +x "./tests/integration.sh"
 
-          echo hello world
-          docker ps
+          wget https://github.com/scrtlabs/SecretNetwork/releases/download/v1.2.5/secretnetwork_1.2.6vr_rocksdb_amd64.deb
+          sudo dpkg -i secret*.deb
+
+          secretcli version
 
           # run script
           "./tests/integration.sh"
