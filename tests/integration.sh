@@ -159,7 +159,7 @@ function upload_code() {
 
     log uploading code from dir "$directory"
 
-    tx_hash="$(tx_of secretcli tx compute store "code/$directory/contract.wasm.gz" --from a --keyring-backend test -y --gas 10000000)"
+    tx_hash="$(tx_of secretcli tx compute store "$directory/contract.wasm.gz" --from a --keyring-backend test -y --gas 10000000)"
     log "uploaded contract with tx hash $tx_hash"
     code_id="$(
         wait_for_tx "$tx_hash" 'waiting for contract upload' |
@@ -492,11 +492,21 @@ function test_sqrt() {
 }
 
 function main() {
+    set -e
     log '              <####> Starting integration tests <####>'
     log "secretcli version in the docker image is: $(secretcli version)"
 
     local init_msg
     init_msg='{}'
+    local dir
+
+    set -e
+    if [[ -z "${IS_GITHUB_ACTIONS+x}" ]]; then
+        dir="."
+    else
+        dir="code"
+    fi
+
     contract_addr="$(create_contract '.' "$init_msg")"
 
     test_permit "$contract_addr"
