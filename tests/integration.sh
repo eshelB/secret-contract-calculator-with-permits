@@ -159,7 +159,7 @@ function upload_code() {
 
     log uploading code from dir "$directory"
 
-    tx_hash="$(tx_of secretcli tx compute store "code/$directory/contract.wasm.gz" --from a -y --gas 10000000)"
+    tx_hash="$(tx_of secretcli tx compute store "code/$directory/contract.wasm.gz" --from a --keyring-backend test -y --gas 10000000)"
     log "uploaded contract with tx hash $tx_hash"
     code_id="$(
         wait_for_tx "$tx_hash" 'waiting for contract upload' |
@@ -187,7 +187,7 @@ function instantiate() {
     log "${init_msg}"
 
     local tx_hash
-    tx_hash="$(tx_of secretcli tx compute instantiate "$code_id" "$init_msg" --label "$(label_by_id "$code_id")" --from a --gas "10000000" -y)"
+    tx_hash="$(tx_of secretcli tx compute instantiate "$code_id" "$init_msg" --label "$(label_by_id "$code_id")" --from a --keyring-backend test --gas "10000000" -y)"
     wait_for_tx "$tx_hash" 'waiting for init to complete'
     log "instantiation completed"
 }
@@ -221,6 +221,20 @@ function log_test_header() {
     log " ########### Starting ${FUNCNAME[1]} ###############################################################################################################################################"
 }
 
+function sign_permit() {
+    set -e
+    local permit="$1"
+    local key="$2"
+
+    local sig
+    if [[ -z "${IS_GITHUB_ACTIONS+x}" ]]; then
+      sig=$(docker exec secretdev bash -c "/usr/bin/secretd tx sign-doc <(echo '"$permit"') --from '$key'")
+    else
+      sig=$(secretcli tx sign-doc <(echo "$permit") --from "$key")
+    fi
+
+    echo "$sig"
+}
 
 function test_query_with_permit_after() {
     set -e
@@ -241,7 +255,7 @@ function test_query_with_permit_after() {
     key=a
     expected_output='{"calculation_history":{"calcs":[{"left_operand":"23","right_operand":null,"operation":"Sqrt","result":"4"},{"left_operand":"23","right_operand":"3","operation":"Div","result":"7"},{"left_operand":"23","right_operand":"3","operation":"Mul","result":"69"}],"total":"5"}}'
 
-    sig=$(docker exec secretdev bash -c "/usr/bin/secretd tx sign-doc <(echo '"$permit"') --from '$key'")
+    sig=$(sign_permit "$permit" "$key")
     permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test","chain_id":"blabla","allowed_tokens":["'"$contract_addr"'"],"permissions":["calculation_history"]},"signature":'"$sig"'}}}'
     result="$(compute_query "$contract_addr" "$permit_query" 2>&1 || true )"
     result_comparable=$(echo $result | sed 's/ Usage:.*//')
@@ -251,7 +265,7 @@ function test_query_with_permit_after() {
     key=b
     expected_output='{"calculation_history":{"calcs":[],"total":"0"}}'
 
-    sig=$(docker exec secretdev bash -c "/usr/bin/secretd tx sign-doc <(echo '"$permit"') --from '$key'")
+    sig=$(sign_permit "$permit" "$key")
     permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test","chain_id":"blabla","allowed_tokens":["'"$contract_addr"'"],"permissions":["calculation_history"]},"signature":'"$sig"'}}}'
     result="$(compute_query "$contract_addr" "$permit_query" 2>&1 || true )"
     result_comparable=$(echo $result | sed 's/ Usage:.*//')
@@ -284,7 +298,13 @@ function test_permit() {
     expected_error="Error: query result: encrypted: Permit doesn't apply to token \"$contract_addr\", allowed tokens: [\"$wrong_contract\"]"
 
     key=a
-    sig=$(docker exec secretdev bash -c "/usr/bin/secretd tx sign-doc <(echo '$permit') --from '$key'")
+
+    log attempting to sign permit:
+    log "$permit"
+    log "from key $key"
+    sig=$(sign_permit "$permit" "$key")
+    log "signature: $sig"
+
     permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test","chain_id":"blabla","allowed_tokens":["'"$wrong_contract"'"],"permissions":["calculation_history"]},"signature":'"$sig"'}}}'
     result="$(compute_query "$contract_addr" "$permit_query" 2>&1 || true )"
     result_comparable=$(echo $result | sed 's/Usage:.*//' | xargs -0)
@@ -296,8 +316,8 @@ function test_permit() {
     permit='{"account_number":"0","sequence":"0","chain_id":"blabla","msgs":[{"type":"query_permit","value":{"permit_name":"test","allowed_tokens":["'"$contract_addr"'"],"permissions":["no_permissions"]}}],"fee":{"amount":[{"denom":"uscrt","amount":"0"}],"gas":"1"},"memo":""}'
     expected_error='Error: query result: parsing calculator::msg::QueryMsg: unknown variant `no_permissions`, expected `calculation_history`'
 
-    permit=$(docker exec secretdev bash -c "/usr/bin/secretd tx sign-doc <(echo '$permit') --from '$key'")
-    permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test","chain_id":"blabla","allowed_tokens":["'"$contract_addr"'"],"permissions":["no_permissions"]},"signature":'"$permit"'}}}'
+    sig=$(sign_permit "$permit" "$key")
+    permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test","chain_id":"blabla","allowed_tokens":["'"$contract_addr"'"],"permissions":["no_permissions"]},"signature":'"$sig"'}}}'
     result="$(compute_query "$contract_addr" "$permit_query" 2>&1 || true )"
     result_comparable=$(echo $result | sed 's/ Usage:.*//' | xargs -0)
 
@@ -308,8 +328,8 @@ function test_permit() {
     permit='{"account_number":"0","sequence":"0","chain_id":"blabla","msgs":[{"type":"query_permit","value":{"permit_name":"test","allowed_tokens":["'"$contract_addr"'"],"permissions":["calculation_history"]}}],"fee":{"amount":[{"denom":"uscrt","amount":"0"}],"gas":"1"},"memo":""}'
     expected_error='Error: query result: encrypted: Failed to verify signatures for the given permit: IncorrectSignature'
 
-    permit=$(docker exec secretdev bash -c "/usr/bin/secretd tx sign-doc <(echo '$permit') --from '$key'")
-    permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test-2","chain_id":"blabla","allowed_tokens":["'"$contract_addr"'"],"permissions":["calculation_history"]},"signature":'"$permit"'}}}'
+    sig=$(sign_permit "$permit" "$key")
+    permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test-2","chain_id":"blabla","allowed_tokens":["'"$contract_addr"'"],"permissions":["calculation_history"]},"signature":'"$sig"'}}}'
     result="$(compute_query "$contract_addr" "$permit_query" 2>&1 || true )"
     result_comparable=$(echo $result | sed 's/ Usage:.*//' | xargs -0)
 
@@ -320,8 +340,8 @@ function test_permit() {
     permit='{"account_number":"0","sequence":"0","chain_id":"blabla","msgs":[{"type":"query_permit","value":{"permit_name":"test","allowed_tokens":["'"$contract_addr"'"],"permissions":["calculation_history"]}}],"fee":{"amount":[{"denom":"uscrt","amount":"0"}],"gas":"1"},"memo":""}'
     expected_output='{"calculation_history":{"calcs":[],"total":"0"}}'
 
-    permit=$(docker exec secretdev bash -c "/usr/bin/secretd tx sign-doc <(echo '$permit') --from '$key'")
-    permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test","chain_id":"blabla","allowed_tokens":["'"$contract_addr"'"],"permissions":["calculation_history"]},"signature":'"$permit"'}}}'
+    sig=$(sign_permit "$permit" "$key")
+    permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test","chain_id":"blabla","allowed_tokens":["'"$contract_addr"'"],"permissions":["calculation_history"]},"signature":'"$sig"'}}}'
     result="$(compute_query "$contract_addr" "$permit_query" 2>&1 || true )"
     result_comparable=$(echo $result | sed 's/ Usage:.*//' | xargs -0)
 
@@ -340,7 +360,7 @@ function test_add() {
 
     log "adding..."
     local add_message='{"add": ["23", "3"]}'
-    tx_hash="$(compute_execute "$contract_addr" "$add_message" "--from" "$key" --gas "150000" "-y")"
+    tx_hash="$(compute_execute "$contract_addr" "$add_message" "--from" "$key" --gas "150000" "-y" --keyring-backend test)"
     echo "$tx_hash"
 
     local add_response
@@ -363,7 +383,7 @@ function test_sub() {
 
     log "subtracting..."
     local sub_message='{"sub": ["23", "3"]}'
-    tx_hash="$(compute_execute "$contract_addr" "$sub_message" "--from" "$key" --gas "150000" "-y")"
+    tx_hash="$(compute_execute "$contract_addr" "$sub_message" "--from" "$key" --keyring-backend test --gas "150000" "-y")"
     echo "$tx_hash"
 
     local sub_response
@@ -386,7 +406,7 @@ function test_mul() {
 
     log "multiplying..."
     local mul_message='{"mul": ["23", "3"]}'
-    tx_hash="$(compute_execute "$contract_addr" "$mul_message" "--from" "$key" --gas "150000" "-y")"
+    tx_hash="$(compute_execute "$contract_addr" "$mul_message" "--from" "$key" --keyring-backend test --gas "150000" "-y")"
     echo "$tx_hash"
 
     local mul_response
@@ -409,7 +429,7 @@ function test_div() {
 
     log "dividing..."
     local div_message='{"div": ["23", "3"]}'
-    tx_hash="$(compute_execute "$contract_addr" "$div_message" "--from" "$key" --gas "150000" "-y")"
+    tx_hash="$(compute_execute "$contract_addr" "$div_message" "--from" "$key" --keyring-backend test --gas "150000" "-y")"
     echo "$tx_hash"
 
     local div_response
@@ -433,7 +453,7 @@ function test_div_by_zero() {
     log "dividing..."
     local div_message='{"div": ["23", "0"]}'
 
-    tx_hash="$(compute_execute "$contract_addr" "$div_message" "--from" "$key" --gas "150000" "-y")"
+    tx_hash="$(compute_execute "$contract_addr" "$div_message" "--from" "$key" --keyring-backend test --gas "150000" "-y")"
     echo "$tx_hash"
 
     local div_response
@@ -459,7 +479,7 @@ function test_sqrt() {
 
     log "calculating square root..."
     local sqrt_message='{"sqrt": "23"}'
-    tx_hash="$(compute_execute "$contract_addr" "$sqrt_message" "--from" "$key" --gas "150000" "-y")"
+    tx_hash="$(compute_execute "$contract_addr" "$sqrt_message" "--from" "$key" --keyring-backend test --gas "150000" "-y")"
     echo "$tx_hash"
 
     local sqrt_response
