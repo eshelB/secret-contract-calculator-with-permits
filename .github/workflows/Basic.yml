@@ -75,7 +75,7 @@ jobs:
           SGX_MODE: "SW"
         run: |
           # make file runnable, might not be necessary
-          # chmod +x "./tests/integration.sh"
+          chmod +x "./tests/integration.sh"
 
           wget -q https://github.com/scrtlabs/SecretNetwork/releases/download/v1.2.5/secretnetwork_1.2.6vr_rocksdb_amd64.deb
           sudo dpkg -i secret*.deb
@@ -87,12 +87,11 @@ jobs:
           # secretcli config node http://localhost:26657
 
           a_mnemonic="grant rice replace explain federal release fix clever romance raise often wild taxi quarter soccer fiber love must tape steak together observe swap guitar"
-          # b_mnemonic="jelly shadow frog dirt dragon use armed praise universe win jungle close inmate rain oil canvas beauty pioneer chef soccer icon dizzy thunder meadow"
+          b_mnemonic="jelly shadow frog dirt dragon use armed praise universe win jungle close inmate rain oil canvas beauty pioneer chef soccer icon dizzy thunder meadow"
 
-          # echo sleeping to let node wake up
-          # sleep 20
-          # echo sleep completed
-          # secretcli query bank balances secret1ap26qrlp8mcq2pg6r47w43l0y8zkqm8a450s03
+          echo sleeping to let node wake up
+          sleep 20
+          echo sleep completed
 
           gpg --batch --passphrase '' --quick-gen-key my-gpg-key
           pass init my-gpg-key
@@ -100,7 +99,7 @@ jobs:
           echo adding key for a
           echo $a_mnemonic | secretcli keys add a --recover
           echo adding key for b
-          echo $b_mnemonic | secretcli keys add b --keyring-backend test --recover
+          echo $b_mnemonic | secretcli keys add b --recover
 
           secretcli query bank balances secret1ap26qrlp8mcq2pg6r47w43l0y8zkqm8a450s03
 
