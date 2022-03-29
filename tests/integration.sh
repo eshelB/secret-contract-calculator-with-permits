@@ -290,7 +290,7 @@ function test_permit() {
 
     # fail due to contract not in permit
     quiet secretcli keys delete banana -yf || true
-    quiet secretcli keys add banana
+    quiet secretcli keys add banana --keyring-backend test
     local wrong_contract
     wrong_contract=$(secretcli keys show -a banana)
 
