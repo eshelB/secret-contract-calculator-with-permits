@@ -72,6 +72,7 @@ jobs:
       - name: integration-tests script
         env:
           IS_GITHUB_ACTIONS: "true"
+          SGX_MODE: "SW"
         run: |
           # make file runnable, might not be necessary
           chmod +x "./tests/integration.sh"
