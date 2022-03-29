@@ -82,9 +82,9 @@ jobs:
           echo installed secretcli with version "$(secretcli version)"
           echo installed on "$(which secretcli)"
 
-          # secretcli config chain-id secretdev-1
-          # secretcli config output json
-          # secretcli config node http://localhost:26657
+          secretcli config chain-id secretdev-1
+          secretcli config output json
+          secretcli config node http://localhost:26657
 
           a_mnemonic="grant rice replace explain federal release fix clever romance raise often wild taxi quarter soccer fiber love must tape steak together observe swap guitar"
           b_mnemonic="jelly shadow frog dirt dragon use armed praise universe win jungle close inmate rain oil canvas beauty pioneer chef soccer icon dizzy thunder meadow"
