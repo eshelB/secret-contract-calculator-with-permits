@@ -13,7 +13,7 @@ function secretcli() {
     if [[ -z "${IS_GITHUB_ACTIONS+x}" ]]; then
       docker exec secretdev /usr/bin/secretd "$@"
     else
-      /usr/local/bin/secretcli "$@"
+      SGX_MODE=SW /usr/local/bin/secretcli "$@"
     fi
 }
 
@@ -159,7 +159,7 @@ function upload_code() {
 
     log uploading code from dir "$directory"
 
-    tx_hash="$(tx_of secretcli tx compute store "$directory/contract.wasm.gz" --from a --keyring-backend test -y --gas 10000000 --keyring-backend test)"
+    tx_hash="$(tx_of secretcli tx compute store "$directory/contract.wasm.gz" --from a --keyring-backend test -y --gas 10000000)"
     log "uploaded contract with tx hash $tx_hash"
     code_id="$(
         wait_for_tx "$tx_hash" 'waiting for contract upload' |
@@ -307,7 +307,7 @@ function test_permit() {
 
     permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test","chain_id":"blabla","allowed_tokens":["'"$wrong_contract"'"],"permissions":["calculation_history"]},"signature":'"$sig"'}}}'
     result="$(compute_query "$contract_addr" "$permit_query" 2>&1 || true )"
-    result_comparable=$(echo $result | sed 's/Usage:.*//' | xargs -0)
+    result_comparable=$(echo $result | sed 's/Usage:.*//' | awk '{$1=$1};1')
 
     assert_eq "$result_comparable" "$expected_error"
     log "no contract in permit: ASSERTION_SUCCESS"
@@ -319,7 +319,7 @@ function test_permit() {
     sig=$(sign_permit "$permit" "$key")
     permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test","chain_id":"blabla","allowed_tokens":["'"$contract_addr"'"],"permissions":["no_permissions"]},"signature":'"$sig"'}}}'
     result="$(compute_query "$contract_addr" "$permit_query" 2>&1 || true )"
-    result_comparable=$(echo $result | sed 's/ Usage:.*//' | xargs -0)
+    result_comparable=$(echo $result | sed 's/ Usage:.*//' | awk '{$1=$1};1')
 
     assert_eq "$result_comparable" "$expected_error"
     log "no permissions in permit: ASSERTION_SUCCESS"
@@ -331,7 +331,7 @@ function test_permit() {
     sig=$(sign_permit "$permit" "$key")
     permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test-2","chain_id":"blabla","allowed_tokens":["'"$contract_addr"'"],"permissions":["calculation_history"]},"signature":'"$sig"'}}}'
     result="$(compute_query "$contract_addr" "$permit_query" 2>&1 || true )"
-    result_comparable=$(echo $result | sed 's/ Usage:.*//' | xargs -0)
+    result_comparable=$(echo $result | sed 's/ Usage:.*//' | awk '{$1=$1};1')
 
     assert_eq "$result_comparable" "$expected_error"
     log "incorrect signature: ASSERTION_SUCCESS"
@@ -343,7 +343,7 @@ function test_permit() {
     sig=$(sign_permit "$permit" "$key")
     permit_query='{"with_permit":{"query":{"calculation_history":{"page_size":"3"}},"permit":{"params":{"permit_name":"test","chain_id":"blabla","allowed_tokens":["'"$contract_addr"'"],"permissions":["calculation_history"]},"signature":'"$sig"'}}}'
     result="$(compute_query "$contract_addr" "$permit_query" 2>&1 || true )"
-    result_comparable=$(echo $result | sed 's/ Usage:.*//' | xargs -0)
+    result_comparable=$(echo $result | sed 's/ Usage:.*//' | awk '{$1=$1};1')
 
     assert_eq "$result_comparable" "$expected_output"
     log "permit correct: ASSERTION_SUCCESS"
