@@ -89,9 +89,9 @@ jobs:
           a_mnemonic="grant rice replace explain federal release fix clever romance raise often wild taxi quarter soccer fiber love must tape steak together observe swap guitar"
           b_mnemonic="jelly shadow frog dirt dragon use armed praise universe win jungle close inmate rain oil canvas beauty pioneer chef soccer icon dizzy thunder meadow"
 
-          # letting the node wake up
+          echo sleeping to let node wake up
           sleep 10
-          curl -s -X GET "http://localhost:1317/cosmos/base/tendermint/v1beta1/node_info" -H  "accept: application/json"
+          echo sleep completed
           secretcli query bank balances secret1ap26qrlp8mcq2pg6r47w43l0y8zkqm8a450s03
 
           echo adding key for a
