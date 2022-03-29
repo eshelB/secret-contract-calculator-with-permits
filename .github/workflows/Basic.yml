@@ -95,7 +95,7 @@ jobs:
           secretcli query bank balances secret1ap26qrlp8mcq2pg6r47w43l0y8zkqm8a450s03
 
           echo adding key for a
-          echo $a_mnemonic | secretcli keys add a --keyring-backend test --recover
+          echo $a_mnemonic | secretcli keys add a --recover
           echo adding key for b
           echo $b_mnemonic | secretcli keys add b --keyring-backend test --recover
 
