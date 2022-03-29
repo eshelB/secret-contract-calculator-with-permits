@@ -230,7 +230,7 @@ function sign_permit() {
     if [[ -z "${IS_GITHUB_ACTIONS+x}" ]]; then
       sig=$(docker exec secretdev bash -c "/usr/bin/secretd tx sign-doc <(echo '"$permit"') --from '$key'")
     else
-      sig=$(secretcli tx sign-doc <(echo "$permit") --from "$key" --keyring-backend test)
+      sig=$(secretcli tx sign-doc <(echo "$permit") --from "$key")
     fi
 
     echo "$sig"
