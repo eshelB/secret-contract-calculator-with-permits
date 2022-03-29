@@ -105,6 +105,8 @@ jobs:
           "./tests/integration.sh"
     services:
       secretdev:
+        env:
+          SECRET_NODE_TYPE: "BOOTSTRAP"
         image: enigmampc/secret-network-sw-dev:v1.2.6
         ports:
           - 26657:26657
