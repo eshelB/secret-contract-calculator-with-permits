@@ -289,10 +289,7 @@ function test_permit() {
     local permit_query
 
     # fail due to contract not in permit
-    quiet secretcli keys delete banana -yf || true
-    quiet secretcli keys add banana --keyring-backend test
-    local wrong_contract
-    wrong_contract=$(secretcli keys show -a banana)
+    wrong_contract="secret148rqk0r5u6ddaf5ynfw2wagd7gyy95h2s9jlv4"
 
     permit='{"account_number":"0","sequence":"0","chain_id":"blabla","msgs":[{"type":"query_permit","value":{"permit_name":"test","allowed_tokens":["'"$wrong_contract"'"],"permissions":["calculation_history"]}}],"fee":{"amount":[{"denom":"uscrt","amount":"0"}],"gas":"1"},"memo":""}'
     expected_error="Error: query result: encrypted: Permit doesn't apply to token \"$contract_addr\", allowed tokens: [\"$wrong_contract\"]"
