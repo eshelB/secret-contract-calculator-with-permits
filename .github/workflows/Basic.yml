@@ -90,7 +90,7 @@ jobs:
           b_mnemonic="jelly shadow frog dirt dragon use armed praise universe win jungle close inmate rain oil canvas beauty pioneer chef soccer icon dizzy thunder meadow"
 
           echo sleeping to let node wake up
-          sleep 10
+          sleep 20
           echo sleep completed
           secretcli query bank balances secret1ap26qrlp8mcq2pg6r47w43l0y8zkqm8a450s03
 
