@@ -94,7 +94,8 @@ jobs:
           # echo sleep completed
           # secretcli query bank balances secret1ap26qrlp8mcq2pg6r47w43l0y8zkqm8a450s03
 
-          pass init github-actions-gpg-id
+          gpg --batch --passphrase '' --quick-gen-key my-gpg-key
+          pass init my-gpg-key
 
           echo adding key for a
           echo $a_mnemonic | secretcli keys add a --recover
