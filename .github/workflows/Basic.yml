@@ -93,8 +93,9 @@ jobs:
           sleep 20
           echo sleep completed
 
-          echo adding key for a
+          echo "adding keys 'a' and 'b'"
           echo "${{ secrets.A_MNEMONICS }}" | secretcli keys add a --recover
+          echo "${{ secrets.B_MNEMONICS }}" | secretcli keys add a --recover
 
           # run script
           "./tests/integration.sh"
