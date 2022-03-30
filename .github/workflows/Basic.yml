@@ -95,7 +95,7 @@ jobs:
 
           echo "adding keys 'a' and 'b'"
           echo "${{ secrets.A_MNEMONICS }}" | secretcli keys add a --recover
-          echo "${{ secrets.B_MNEMONICS }}" | secretcli keys add a --recover
+          echo "${{ secrets.B_MNEMONICS }}" | secretcli keys add b --recover
 
           # run script
           "./tests/integration.sh"
